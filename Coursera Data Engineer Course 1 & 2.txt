@@ -1,0 +1,59 @@
+Serialization languages (xml, json, yaml) help transfer data easily and quickly between systems and processes
+Datalake: Storage for bid data and unstructured, files, blob, tables, etc
+NoSQL(Cosmos DB): Scalability, Key-vale(Queries faster, No Querie Language), Graph(nodes), Document(Markup language like XML or JSON)
+Atomicity: Execute once. either all of the work is done or none of it is
+Consistency: Dats is consistent before and after the transaction
+Isolation: a transaction Can not modified data from another transaction
+Durability: Changes made are permament saved 
+
+When db offers acid guarantee, these principles are applied to any transaction
+If my data benefits from acid principles, choose a storage solution that supports transactions
+OLTP: DB that business uses to store all transactions and records, supports lots of users and handle large vvolumes of data, minimal dwon time
+OLAP: Technology that organizes large business db and support complex analysis, perform complex analytical queries
+
+Product catalog data should be stored in transactional db
+Photos and videos: transcational support is not required
+
+Azure Cosmos: Supports SQL and ACID, replication enabled, indexed every propertie in the documents, can choose from 5 consistency levels of data
+	Product catalog data: Semi estructured, high number rw operation, high troughout and low latency, transactional support required
+
+Microsoft Azure SQLDb: Enables to combine structured data in the columns and semi structured columns
+	Can provide many of the same Cosmos benefits
+	Explicitly define properties from semi structired documents should be inexed 
+
+Azure blob storage: Supports storing files (photos and videos)
+Azure Synapse: Supports OLAP solutions and SQL queries
+
+Storage: Sotarge account no financial cost (Settings increase it), accesible through HTTP and HTTPS
+	Standard: Any data service (Blob, file, queue, magnetic disk drive)
+	Premium: Store unstructured as blob, create premium file shares, solid state (SSD), replication (minimun 3 copies of data LocallyRedudantSotre)
+	Increase cost: Redundancy
+	To connect an app to a storage account, I will need access key and REST API endpoint 
+	REST ENDPOINT: Combination of the storage account name, data type, and a known domain.
+		https://[name].blob.core.windows.net/
+		https://[name].queue.core.windows.net/
+		https://[name].table.core.windows.net/
+		https://[name].file.core.windows.net/
+	SAS (Shared Access Signature): Offers a separate auth mechanism, support exploration and limited permissions for scenarios where I need to grant limited acces
+	All data by default in Sotrage account is encrypted by service storage encryption with 256 bit advanced encryption standard cypher
+	Decryption of the data is automatically and does not impact the performance of the data
+	Secure transfer option in the storage account enforces the data moved between azure and client is secure through HTTPS 
+
+Conection String: provides all needed conectivity info in a single text string
+Access Keys: Provide acces to storage account. Equivalent to username and password to a computer
+Encryption: For VMS Azure let me encrypt virtual hard disk or VHDs by using Azure disk encryption 
+Storage analytics: Logs every operation in real time 
+Shared Access Signature (SAS): For untrusted clients and to delegate access to storage objects 
+	Service Level: to allow access to specific resources, to retrieve a list a list of files, to download a file 
+	Account Level: allow access to anything that Service level can allow + additional resources and abilities, to create file system 
+Azure defender: Extra cost, available for blob, files and DataLakeGen2 
+Azure Storage Data Lake Gen2: Build on Blob sotrage, RBAC, provides acces control lists (ACL), authenticate through AAD (OAuth2.0), MFA)\
+Azure Blob Storage: Blobs are files for the cloud (Binary Large Object), can be reach from anywre with an internet conaction, unstructured.
+					Usually not appropiated for structured data that needs to be queried frequently, higher latency, dont have indexing featues,
+					up to 8TB of data for VMs
+	Block Blobs: Composed by blocks of different sizes, store discrete, large binary objects that change infrequently
+	Append Blobs: Supports only appending new data, not supported deleting or updating, up to 4MB size, max size of 195GB
+	Page Blobs: Involve random access rw, sotre virtual hard disk (VHD) used by Azure VMs, can hold up to 8TB
+	
+	
+
