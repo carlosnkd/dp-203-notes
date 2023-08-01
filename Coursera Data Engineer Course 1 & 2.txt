@@ -1,4 +1,5 @@
 
+
 Serialization languages (xml, json, yaml) help transfer data easily and quickly between systems and processes
 Datalake: Storage for bid data and unstructured, files, blob, tables, etc
 NoSQL(Cosmos DB): Scalability, Key-vale(Queries faster, No Querie Language), Graph(nodes), Document(Markup language like XML or JSON)
