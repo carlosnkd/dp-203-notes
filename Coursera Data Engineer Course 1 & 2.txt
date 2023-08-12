@@ -1,5 +1,4 @@
 
-
 Serialization languages (xml, json, yaml) help transfer data easily and quickly between systems and processes
 Datalake: Storage for bid data and unstructured, files, blob, tables, etc
 NoSQL(Cosmos DB): Scalability, Key-vale(Queries faster, No Querie Language), Graph(nodes), Document(Markup language like XML or JSON)
@@ -57,5 +56,469 @@ Azure Blob Storage: Blobs are files for the cloud (Binary Large Object), can be 
 	Append Blobs: Supports only appending new data, not supported deleting or updating, up to 4MB size, max size of 195GB
 	Page Blobs: Involve random access rw, sotre virtual hard disk (VHD) used by Azure VMs, can hold up to 8TB
 	
+Data Factory and Synapse: Manage and orchestrate the movement of data between data stores in Azure
+			Automate a regular process of data movement
+	   		Much of the functionality of Data factory appears in Synapse, as a feature referred as pipelines (interate pipelines between SQL pools, Spark pools and sql serverless)
+
+Data Factory: Cloud data integration service that orchestrate the movement and transformation of data between various data stores and compute resources
+		Provides an array of tools to enable to transform and clean data, can be done Code-free
+		Allows me to create data driven workflows and transforming data at scale (can be scheduled)
+		Orchestration: Sometimes Data Factory can call another service to make a task on its behalf (call databricks to make data transformation)
+		Provide lineage viz
+		Core activities: Linked services defines a target data store or a compute service, datasets, data factory object (activities) define action to be perfomed, pipeline
+				Pipelines: Parameters are key value pairs of ro config, are defined in the pipeline
+						Arguments for defined parameters are passed during execution from the run context
+				Activities: Consume the parameter values
+				integration runtime (provides infraestructure fot the activity and linked services): Enables to bridge activity and linked services objects
+							Types: Azure, Selfhosted, Azure-SSIS (SQL server integration services)
+		To create an instance, the user account that I use to sign in to azure must be a member of the contributor or owner role ot admin of the Azure Subscription
+		Data Factory Contributor: To create and manage child resources
+			Permissions: Create,edit, delete data factories and child resources
+					Deploy resource manager template
+					Manage app insight alerts
+					support tickets
+		Contributor:PowerShell/SDK
+		When copying between two cloud data sources when both source and sink linked services are using Azure IR, Azure Data Factory will use the regional Azure IR if you specified.
+
+Data integration patterns:
+- ETL: Extract: Define source (resource group, suscription, SAS), define data to be extracted (query, files, blob storage)
+	Transformation: Map source between data source and data destination
+	Load: Define destination, might write code to interact with API
+	 I can store data in its original format, define the data structure on the transformation phase
+
+- ELTL
+- Modern Data Warehouse workloads: Centralized data store the provides descriptive analytics, data warehouse acts as a central repository
+- Advanced Analytical workloads: 
+
+Azure Data Factory provides the integration form source systems into a datalake store and can initialize compute resource such as databricks 
+Pipelines: Data driven workflows that 1. Connect and Collect: Define all required sources
+					2. Transform and enrich
+					3. Publish
+					4.Monitor 
+
+
+Data ingestion methods: 
+	Copy Activity: For pipelines that doesnt need any transformation for the data, simple to create, not able to deal with sophisticated transformation
+	Compute resources: process data by a data platform service such as Azure ML, Azure SQL, Azure Databricks, Azure Functions, are made for complex calculations
+	SSIS packages: Can containg both ingestion and transofmration logic from on premises and on cloud data stores, ADF provides ability to shift and lift existing 
+
+
+
+Data Facotry connectors: Objects that enable link services and datasets to connect to data sources and sinks.
+	Formats available: Avro, Binary, Delimited, JSON, ORC, Parquet
+
+**************************************************************************************************************************************
+On-Demand HDInsight Cluster (compute resource)can carry out Spark, MapReduce and Hadoop Straming Activities 
+Tools to deploy and manage existing SSIS using ADF: SqlServerManagementStudio (SSMS) and SQL Server Data Tools (SSDT)
+Port 3389 is configured by default to allow traffic through the NSG
+**************************************************************************************************************************************\
+
+Data Ingestion Security:
+	 *** If I want to ingest data from SQL Server database hosted on an on-premise Window Servers, I should ingest data from there using Self-Hosted Integration Runtime *** 
+	Network: 
+		VN: Allow sercure comuinication between Azure Services or with servers that exist in an on premise network
+			When using Azure SSIS IR, I have the option to join a VN, this enables ADF to create netwrok resources 
+		Services: To prevent and detect intrusions. Deny communication with known IP addresses by enabling DistributedDenialofService(DDoS, protection standard on the VM)
+				Deny communication to known malicious or unised IP addresses 
+		Security rules: Network Securityt Group (NSG): Capability of Azure VN to filter network traffic to/from Azure resources in an Azure VN
+	Identity and access: 
+		Admin Accounts: should be dedicated known accounts monitored and managed on a regular basis to confirm they are not compromised
+		AD: s
+	Data protection: RBAC to control access to the data 
+			and sensitive data: mantain list of datastore that manage sensitive data
+						isolate the systems that store or process sensitive info
+						monitor and block unauthorized transfer of info
+						encrypt in transit and in rest
+	Logging and monitoring: Whos accessing my data, I can Azure Monitor to centralize logs and query the by using Analytics
+
+Data Fzcvtory: 3 methods to perform data transformation
+	Code Free: Using mapping data flow feature. Viz desgin transformation dataflows
+		Benefits: Perform data cleansing, transofmration and aggregations
+		Results are flows that are executed as activities in piplelines inside ADF
+		Types:
+			Schema modifier: Will make a modification to a sink destinatio by creating new columns based on the action og the transformation
+			Row modifier: Impact how the rows are presented in the destination (sort data)
+			Multiple I/O: Will generate new data pipelines or merge pipelines into one. (Combine multiple data stream)
+	SSIS packages: Excecute packages so I can leverage existing investments in my data transformations, I can lisf and shift existing SSIS packages by creating an SSIS IR (integration runtime)
+			Deploy and manage using SSDT and SSMS
+	Compute Resource: Databricks, HDInsights, Azure ML, ADF orchestrate data to be executed
 	
+
+Debugging mapping dataflow:
+	- Turn on DafaFlowDebug feature (will provision spark cluesters required to interact with the mapping data flow transormations)
+	- Integration runtime: 
+		Autoresolve: Cluster w 8 cores will be available during 60 min
+	*** Synapse, Blob storage, Cosmos DB can be used in a source transformation
+	*** Activities: Conditional split, Aggregate, Exists
+	*** Develop: Load a dimension table in Synapse from source data  using mapping dataflows
+	*** DataLakegEn2 as connector Service principal is an auth supported in the instance
+		Supports data formats of csv and parquet and auth of account Key and service principal
+
+ADF Wrangling data: Data flow object that can be added to the canvas designer as an activity (code free)
+			Uses Online Mashup Editor (aesthetics of Excel)
+		
+
+Data ingestion using ADF and Databricks:
+	- Create Azure stroage account, create ADF, create dataworkflow pipeline, add databricks to pipeline, performa analysis on data
+
+Integrate SQL server in ADF:
+	- Open ADF, Select "New" in the Integration Runtimes option under "Manage", select Azure SSIS
+
+
+Slowly changing dimensions SCD): table sin a dimensional model that handle changes to dimension values over time
+	*** When ther source data dont store versions, I must use an intermediate system, like a warehouse to detect and store changes
+	*** Field values changes over time, not on a set schedule
+	*** Rapidly changes are stock market prices
+	*** In a star schema if I have customer name and phone number, a new phone number needs to be updated on the db instead of treating the customer as a new record
+	Type 1: Most common, always reflects the lastest values, when changes in data source are detected, the dimesion table data is overweitten
+		It has additional columns to show when last modified date was
+	Type 2: Most common, supports versioning of dsimension members. The dimensoin table must use a surrogate key to provide a unique reference to a version of the dimension member
+		It also includes a flag column "Is current" to Boolean, and start-end date. It will include a key thats not unique, so we have to provide one
+		Keeps history of changes in dimension members by adding a new row
+	Type 3: Supports 2 versions of a dimension member as separate columns, current value and prev value as columns(current email and original email)
+	Type 6: Combineas 1,2 and 3. Store current value in all versions of all entitiy, so I can easily report on the curr or historical value
+
+
+
+ADF: Create data driven workflows for orchestrating data movement and transforming data at scale between data stores and coompute resources.
+	Control Flow: Orchestration of pipeline activities, looping containters
+		Chaing activities: I can chain inside a pipeline
+		Branching: similar to "If-else"
+		Parameters: Defined at the pipeline level and pass arguments while invoking the pipeline or from a trigger 
+		Custom state passing: Activity outputs including state can be consumed by a subsequent activity in the pipeline
+	Pipelines can be trigger by on demand event based, can take 0 or more input datasets and produce 1 or more output datasets
+		Schedule trigger
+		Tumbling window trigger: operates on a periodic interval while also retainging state
+		Event-based
+		Activities in ADF: Data Movement, Data transformation, Control Activities
+	Excecute pipeline activity: Allows pipeline to invoke another pipeline
+	Delta loads: only lead data that has changed since the previous iteration of a pipeline
+	Dependency conditions: Succeeded, failed, skipped and completed
+		If Activity A is followeb by activity B and activity B has a dependency condition on activity a succeeded, activity b only run if activity A has the status of succeeded
+			if activities in a pipeline are not dependent on previous activities, can be run in parallel
+
+
+ADF Debug: There is no need to publish changes in the pipeline or activities begfore the debug, is useful when want to test the changes and see if works as expected before publish
+		and saves them
+	I can specify what values to use during debugging by selecting Parameters tab if I have them in a referenced dataset
+	Output: monitor runs, but only for most recent, it wont show history, they can be show in the monitor tab (only keeps them for 15 days)
+
+Parameters:
+	The command for reference global parameters in Azure is pipeline.globalParameters()
+	When integrate global parameters in a pipeline using continous integration and continous deployment in ADF:
+		- Include global parameter in the Azure Resource Manager template
+		- Deployu global parameters via PowerShellScript
+
+Activity Expressions:
+	- Control flow expression
+	- Data flow expression
+	- Static literal value
+
+
+Data factory packages for SSIS:
+	- I can provision an Azure SQL Server Integration Service (SSIS) integration runtime (IR)
+	- An SSIS IR supports running packages that are to be deployed into SSIS catalog, SSIS DB hosted by Azure SQL DB server or managed instance
+	- Also support running packages that are to be deployed into file system, Azure Files or SQL Server Database MSDB hosted by SQL Managed instance
+	- Once Azure SSIS IR is provisioned, the same tools for deployment and running the packages in Azure can be used.
+
+
+*******************************************************************************************
+Synapse is a supported connector for buil int parametrization for liinked services
+Continous Integration produces deployable code, infraestructure and other artifacts to be deployed
+Continous delivery helps in depllying the integrated and built code into diff delivery stagees as new versions of the product
+*******************************************************************************************
+
+
+
+SSIS: Platform for developing extracti, transformation and load ATL solutions for on premises data warehouses, analytical solutions and in some cases, migration process
+	Platform for building ETL solutions
+	SSIS packages definiing a workflow task to be executed. The workflow of tasks in a package is referred as control flow
+	When creating SSIS IR runtime are required admin username, subscription in the deployment setting page
+	To ingest data from SQL DB hosted on an on premise windows server, the SelfHosetd IR is required for ADF to ingest data
+	Adf provides the capability to lift and shift SSIS solutions to the cloud so they can be utilized inmediately
+	SSIS is a component within SQL Server and consists of a windows service that manages the execution and developing of ETL worfflows
+	SSIS is tipicawlly used to develop data integration pipelines for onp remises data warehousing solutions. It can also be used to create data migration pipelines when migrating
+		data between different systems
+	ISS is a primarely control flow engine that manages the execution of workflows, workflows are heald in pakcages which can be executed on demand or on a schedule 
+		A project s the unit of deployment for SSIS solutions
+		Packages can include package level parameters
+ 	
+	To lift and shift an existing SSIS workload I can create an Azure SSIS IR, in ADF, an activity defines the action to be perfomred, a linked service defines a target data store,
+	the IR provides the link between the activity and the Linked service
+	The location of the Azure SSIS IR does not havec to bethe same as the locationof the dataFactory, but it MUST be the same of my Azure SQL db 
+	To use SSIS IR it is asumed that tere is an SSIS catalog or SSIS DB deployed on a SQL server SSIS instance
+	Node size, existing instance of azure SQL DB to host the SSIS catalog or SSIS DB and the service tier fot the DB, and maximum parallel executions per node
+	When migratin db workloads from SQL Server on Premises to Azure SQL DB, I might have to migrate packages as well, Data Migration Assistan can help to make sure that the SSIS packages
+	are compatible in Azure
+
+
+
+ 
+ADF: Can be develop using the user experience or SDK(software development kit), there are Python libraries to perform the mgmnt of the service  "pip install azure-mgmt-datafactory"
+	UX has limitations: Data factory service doesnt include a repository for storing the KSON entities for my changes, the only way to save changes is to "Publish all"
+	Data Factory is not enable for vesioning nor collaboration
+	ADF allows to configure a GIT repository, every contributor always has equal permissions and are allowed to edit and to publish changes to ADF
+	256: Limit on the number of parameters allowed in an ARM Resource Manager Template
+	
+
+Asure Data Share: Take the shared data and connect it to ADFpipelines
+			ADF and Azure Data Share simplify the data integration from multiple sources
+			Common requirement: Access to external data to gain insights
+			ADF gives me the opportunity to perform cold free ETL and ELT
+			Snapchot: Option to automatically get the refreshed data on a shared dataset 
+
+
+Ingest data to DataLakeGen2 using ADF: To create a pipeline first I have to set up linked services(fin the conection info for ADF to the external resources I want to connect with) in ADF 
+					The connection to the data source represent the data structure(purpose of linked services is to represent and show data stores and compute resources) 
+					To ingest data I can use the CopyData activity in a ADF pipeline
+					The pipelines, configuration of the data set and debug of the pipeline must me in ADF 
+
+
+
+Join and transform shared and owned data: I can use mapping data flow in ADF
+Sink Dataset into analytics using ADF: When finished joinning and transforming dataset, I have to write the new created dataset into a destination
+					Using Sink Transformation option in ADF
+					Every dataflow requires at least one sink transformation, but I can write to as many sink as necessary
+					It is possible to add or remove datasets with Azure Data Share after it has been created
+					If a connector in ADF is not supported in a mapping data flow task, I must ingest the data into a supported source using the copy activity
+					If I use the publish all button ADF first runs a validation check (to validata thet all the resources meet the requirements)
+					The monitor tab is where I can track all my pipelines (the default store is 45 days), I can confiugure ADF with Azure monitor to keep them for longer
+					
+
+Azure Synapse: Integrated analytics platform that combines data warehouseing, big data analytics, data integration and viz into a single environment.
+		Type of system: Massive Parallel Processing (MPP) system
+		Supports: Descriptive analytics,diagnostic analytics, predictive analytics and prescriptive analytics
+		Synapse SQL: Distributed query system that enables you to implement data warehousing and data virtualization scenarios using standard T-SQL, offers serverless and dedicated
+				resource models to work with descriptive and diagnosrtic analytical scenarios
+		*********************************************************************************************
+		For predictable performance and cost, create dedicated SQL pools to reserve processing power for data stored in SQL tables
+		For unplanned or ad hoc workloads use the serverless SQL endpoint (always available)
+		*********************************************************************************************
+		Leverage the capabilities of ADF, offers cloud based ETL and data integration services
+		I can use ADF to load data into Synapse
+		On the initial deploy of Sunapse also deploys: Synapse worskpace and Azure Data Late Storage Gen2 (Acts as the primarly storage for the workspace)
+		SQL and SQL on demand end-point: Use to integrate to external tools such as SSMS, Azure Data Studio or Power BI
+		Modern data warehouse: Ability to integrate all data (including biug data) for analytical and reporting purposes independent of its location or structure
+		Serverless SQL pool  enables analystis to explorte data within my data estate
+		Pipelines combine data from multiple sources
+		Synapse stores application logs under a folder called syunapse/workspacename
+		Enable to crerate SQL or Spark pools within the workspace, this featue enables different engines to share databases and tables
+		P/E: A shared Hive compatoble metadata system allows tables to find on files in the Data Lake to be seamlessly consumed by either Spark of Hive, SQL and spark can directly explore and 
+			analyze parquet, CSV,TSV, and JSON files store in DataLake
+		Data virtualization: allows me to interact with data without the need to understand how the data is formatted, structured or what type is
+		Spark pools: Capability to process large amounts of data in memory. Clusters are groups of computers that are treated as a single computer and handle the excecution of commands
+				Speed and efficiency, ease of creatind and use, scalability
+				Starts: < 2 min for < 60 nodes: <5 min > 60 nodes
+				Auto-scaling enables, can be shut with no risk of data loss as data is saved in Azure Storage or DataLake Storage
+		Hybrid Transactional and Analytical Processing (HTAP): Perform analytics over a db that is seen to provide transactional capabilitiues without impacting performance of the system
+		Azure Synapse Pipelines are based on ADF service
+		
+		ETL: Method to populate permamnent tables with data in a data warehouse
+		Synapse Link: Component tha enables HTAP
+		Activities: Ingesting data via copy activity, mapping data flow to perform free-code data transofrmations
+		Parameters: Key-value pairs of RO config, defined in the pipeline, arguments executed via run context or pipeline, consume parameters value
+		Azure Synapse pipelines has an IR that enables it to bridge between the activity and the linked servies objects
+				IR: Azure, Self-hosted, ADF, Azure SSIS
+		Data warehose: Extracts, cleans and transform data, stores data in permament tables usgin an ETL process
+				Ingest an Prepare: ADF, Databricks
+				Store: ADLS Gen2
+				Model and Serve: Synapse Analytics
+				Viz: PowerBI
+				**************************** I can only use Synapse **********************************
+				**************************** In the case there already an investment using ADF, Databrricks...I can continue with that approach****************************
+
+		Data virtualization: 
+		Data preparation: AZF, Databricks
+		Store: Azure Data Lake Store Gen2
+		Model and Serve: Synapse analytics	
+		Develop tab: SQL, Notebooks, Dataflows, PowerBi
+		Integrate: Pipelines, triggers, IR, Apache Spark applications, SQL requests, Data flow debug
+		Data: In the linked tab of the data hub is where I can view the contesnts of the primary Data Lake Store	
+		Manage:Shows the management categories grouped under Analytics pools, External connections, integration and security
+				SQLP Pools, Apache Spark Pools, linked serfgices, Azure Purview (Preview), Triggers, IR, Access control, credential, managed Privte Endpoints, Workspace packages, git config
+		Types of data not able to process as PDF now is possible through cognitive services such as AI tech, theyre outtputed in a text-based format that cvan be stored in ADLS Gen2
+		I can ingest the data at the source directly to the warehouse, it is more common to store the source data within a staging area (landing zone). It is tipically a neutral stroage area
+			that sits between thesource system and the data wareohurse (to reduce contention on source syustems, to deal with the ingestion on diff schedules, to join data from diff sources)
+		Data dumpling: Transformation and cleansing free approach (grab the data as a source and dumping the data into the staging area)
+		Batch: Queries or programs can vary in completion time
+		Intreractive query: Queries that produce results in seconds to min
+		Real-time: Queries of data strams that produce results incredible fast
+		Azure IOT Hub, Azure Event Hubs to ingest treaming data into synapse dedicated SQL pools
+		Azure stream analytics connects to IOT Hub or Even Hub as the input source and output files to the ADLS Gen2 as output
+		Path aptterns options: serialization, cencoding, min rows per file
+		Synapse pipelines, Synap[se spark pools or copy statments to load the data into a dedicated SQL pool 
+		Data storage formats:
+			Raw data: Native format
+			CSV: Data from relational db (Support by most of the systems, most flexible)
+			JSON: Data from web APIs and NoSQL DB
+			Parquet: Refined versions of the data for possible querying
+				Industry of alingment on format, high performance column oriented format optimized for big data scenarios, compression is more efficient, efficienmt use of data and encoding
+		Data storage considerations: Organize my data into larger sized files for better performance, 256 megabytes, 100 gb in size
+						File size, number of files and folder structure have an impact on performance, having data as many small files can negatively affect performance
+		Enabling Debuig mode while building data flows in Synbapse turns on a Spark Cluster
+		Star schema: Modelers to classify their model tables as their dimension or fact table (fact at the center of the schema)
+				- Dimension tables describe business entities: products, people, time, unique identifier
+					Replicate Distribution will result in a copy of the table on each comput node, which performs well with joins to the distributed table
+				- Fact: Obervations or events, can be sales orders, stock balances, exchange rate, temperatures, contains dimension key columns and numeric measure columns
+					Dimension key columns determine the dimensionality, dimension key values determine the granularity
+					Hash distribution (Recomended): Provides good read performance for a large table by distributing records across compute nodes based on the hash key
+		Snowflake schema: set of normalized tables for a single business entity. Categories are assigned to subcategories and products are in turn assigned to subcategories
+					You add normalized dimension tables to a star schema to create a snowflake pattern				
+		Some of the main design goals and loading data is to manage or minimize the impact on analytical workloads.
+		Managing source data files: Maintain well-engineered DataLake structure: Allows to know that the data Im loading is consuistent with the data requirements for my system (folder hierarchies)
+						Compressing and optimizing files: Best to use the compression capabilities of the file format, less time is spent on the data transfers, mantain curated source files
+										and columnar compressed file formats (resource config, gzip, parquet, optimized row columnar)	
+						Splitting source files: Decoupled storage: Segmented in 60 parts (should mantain aligmnment to multiples of this number as much as possible)
+									Splitting source files help mantain good performance when loading into Synapse because of its compute node to storage segment alignment
+		Data warehouse is built on massibvely parallel processing systems are built for processing and analyzing large datasets
+			they perfomr well with fewer and larger batch type loads and updates that can be distributed accrross the compute nodes and Storage
+			- Singleton or smaller transaction batch load should be grouped into larger batches to optimize the Synapse SQL POOLS processing capabilities
+				The insert statment may be the best approach to a one-off lead to a small table
+		Dynamic Reesources: smallrc(default), mediumrc, largerc, xlargerc
+		Currency slots: SQL Pools capability to allocate memory to connected users
+		Optimize load execution operations: Consider reducing or minimizing the number of simultaneous load jobs that are running
+							Assign a higher resource classes (smallrc, mediumrc...) to reduce the number of active running tasks
+		To facilitate faster load times I can create a workload classifier for the laod user with the important set to above normal or high
+		Dedicated SQL Pool workload management: Gives me more control over how my workload utilizes system resources
+			Workload classification: Allows workload policies to be applied to requests through assigning resource classes and importance,
+				A solution will often have a workload policy for load queries such as lower importance compared to load activities
+				Load data: Insert, Update, Delete statments
+				Query data: Select statment
+				I can subclassify query loads (gives more control), they can consist of cube refreshes, dashboard queries or ad-hoc queries
+			Workload Importance: Influences the order in which a request gets access to resources
+						Low, Below Normal, Normal(set as default), Above Normal, High. Request with same importance have the same scheduling behavior
+						SQL statments such as begin, commit and rollback are not classified
+			Workload Isolation: Reserves resources for a workload group (also allow to define the amount of resources that are assigned per requests, mechanism to apply rules)
+		Resource classes are pre-determined resource limits in Synapse:
+			- Smaller resource classes
+				reduce maximum memory per query
+				increases concurrency
+			- Larger resource classes
+				increases mazimum memory per query
+				reduces concurrency
+*************************Load data directly from Azure Storage with COPY T-SQL statment*************************
+		Poor load performance, poor query performance and low concurrency are some symptoms of performance issues related to table
+			- First response will be to ensure the data warehouse is set to the appropiate service level range to ensure there is enough memory and concurrency slots available for multiple connections to service
+			- I can address of low currency by scaling the service within the Azure portal, Synapse, PowerSheell or issuing a T-SQL
+			- When looking for fast query response times, heap structure is NOT a good choice
+		Table geometry: Defines how data is sharded into distributions on the available compute nodes to optimize performance of the system
+			- Round-robin(Default and quick): Distributes data evenly across all the compute nodes (most straightforward and delivers fast performance when used as a staging table)
+			- Hash: Uses a hash function to assign each row to one distribution determinalistically. One of the cols is designated as the dist column
+				Uses the values of the dist col to assign each row to a distribution (highest query performance for joins and aggregations in large tables)
+			- Replicated: cache a full copy on each compute node (fastes query perfromance for small tables)
+		When data is laoded into Synapse dedicated SQL pool:
+			The datasets are broken up and dispersed among the cimput nodes for processing
+			Tehn this is written to a decoupled and scalable storage layer (Sharding)
+****************THE decitions around how to split and disperse the data among the nodes and then to the storage is important to querying workloads (correct selection minimizes data movement)
+		Heap: When a table is created by default, the data structure has no indexes
+		A well designed indexing system can reduce disk I/O operations and consume less system resources, specially when using filtering scans and joins in a query
+		Dedicated SQL Pools indexing options:
+			Clustered columnstore: By default, offerst best level of data compression and has the best overall query performance
+				Will generallytoutperform clustered row store indexes of heap (best choice for larger tables)
+				Works on segments of 1,024,000 rows that get compressed and optimized by col
+			Clustered index: Define how the table itself is stored, ordered by the columns used for the indez
+				There can be only one clustered index on a table
+				Best for queries and joins that required data to be scanned, preferaeably in the same order that the data is defined
+			Non-clustered index: Can be defined on a table or view with a clustered index or on a heap
+				Each index row contains the non clustered key value and a row locator
+				This is a data structure separate or additional to the table or heap
+				I can create multiple
+				Best when using when combining columns and a join group by statments, or where clauses return an exact match or few rows
+		Statistics in dedicated SQL pools(turned on by default): using a cost-based optimizer to choose an execution plan that will execute the fastest
+			SELECT, INSERT-SELECT, CTAS, UPDATE, DELETE, EXPLAIN
+			AUTO_CREATE_STATISTICS is configured by checking:
+				SELECT name, is_auto_create_stats_on
+				FROM sys.databases
+		Statistics in serverless SQL pools: tries to determine which access paths to the data will result in the least amount of effort to retrieve data required to resolve the query
+			sys.sp_create_openrowset_statistics [ @stmt = ] N'statement_text'
+
+		Materialist views: Pre written queries wth joints and filter whose definitions is saved and the results persisted to a dedicated SQL pool, not supported in serverles SQL pools
+			Results in increased performance since the data witrhin the views can be fetched without having to resilve the underlyuing query to base tables
+			Restrictions:
+				- In the first criteria he select statment needs to met one or two criteria minumim
+				- In the first criteria the selected list cojntains an aggregate function (max, min or min avg count, count big and so on)
+				- In the second criteria the group by is used in the materialized view definition and all columns in group by are included in the select list
+				- Up to 32 columns can be used in the group by clause
+			******** Only Hash and round robin table distribution supported ********
+			******** Only Clustered column sotre index indexing supported ********
+		SQL pools supports ACID transactions
+			Locking and blocking mechanisms are put in plaace to maintain transactional integrity while providing adequate workload concurrency
+				May significantly delay the completion of queries
+			Isolation level is "read uncommitted" by default
+				read commmitted should be employed to alleviate delays in completions of queries
+		Results set-cashing: Up to 1TB, data within the results that cash is expired and purged after 48 hours OF NOT BEING ACCESSED
+			Sotres a copy of the results set on the control node so that the queries do not need to pull data from the storage subsystem or compute nodes
+			Allows susbsequent query executions to get the results directly from the persisted cash, so re-computation is not needed
+			Improves query performance and reduces computre resource usag
+		Spark and SQL pools: Through Azure Synapse Apache Spark to Synapse SQL connector (Transfer data from between a datalake store via Apache Spark and dedicated SQL pool)
+			- Directly Explore and analyze parque, tsv, csv, and json files stored in Data Lake
+			- Enable fast, scalable loads for data transfer between SQL and Apache spark
+			- Make use of shared Hive compatible metadata systems to define tables on file
+			- Desiged to transfer data between serverless Apache Spark pools and Dedicated SQL pools and Synapse
+			- Works with Dedicated SQL pools only
+			- If I use Apache Spark SQL to store tables  I can query from T-SQL (without need to use create external table)
+			- When using the integrated notebook experiencie from Synapse, there is no need to use import statments for transfering data between a dedicated SQL and Apache Spark pool
+			- Polybase is used to load the data into a dedicated SQL pool
+			- Spark and SQL share the same underlying metadata store
+			- ADLS Gen 2 and Polybase is used to efficiently transfer data between Spark cluster and Synap[se SQL instance
+		Auth: Token service connects with AAD to obtain the security tokens when using storage account or storage warehouse
+			- No need to create credentials or specify them in the connector API
+			- This connector only works in Scala
+			- Prerequisites:
+				The account used needs to be a member of db_exporter role in database or SQL pool from which I transfer data to or from
+				The account used needs to be a member of Storage Blob Data contributor role on the default storage account
+		T-SQL Capabilities
+		Window Functions: Perform a mathematical equation on a set of data that is defined within a Window(typically an aggregate function)
+						SELECT
+						ROW_NUMBER() OVER(PARTITION BY Region ORDER BY Quantity DESC) AS "Row Number",
+						Product,Quantity,Region
+						FROM wwi_security.Sale
+						WHERE Quantity <> 0  
+						ORDER BY Region;
+				*************************************************************
+				When we use PARTITION BY with the OVER clause (1), we divide the query result set into partitions.
+				The window function is applied to each partition separately and computation restarts for each partition.
+				*************************************************************
+			- Instead of applying the aggregate funtion to all the rows in a table, it is applied to a set of rows that are defined by the window function
+			- Then, the aggregated is applied to it
+			- One of the key componentes is the over clause (determines the partitioning and ordering of a row set before the associated Window function is applied)
+			- Can be used with functions to compute aggregated values (moving average, cumulative affregates, running totals)
+			- If used the rows and range clases to further limit the rows within the partition I should specify start and endpoints within the partition
+				Logical association
+				Physical association: Achieved by using the rows clause
+			- Supports BETWEEN, UNBOUNDED PRECEDING, PRECEDING CURRENT ROW, UNBOUNDED FOLLOWING, FOLLOWING
+		Aprox Execution: Some task can be time consuming (DISTINCT COUNT on a 1+ billion rows, and not necessarily has to be accurate)
+			- Synapse supports aproximate execution using HyperLogLog accuracy to reduce latency when executiing queries with alrge datasets
+			- Used to speed up the execution of queries with a compromise for a small reduction in accuracy (result with a 2% accuracy of the true carinality on average)
+			- Done by using APPROX_COUNT_DISCTINT (T-SQL function)
+		Stores procedurtes: Great way to encapsulate 1+ SQL statments or a reference to Microsoft.NET framework common language runtime (CLR)
+			- Can accept input parameters and return multiple values
+			- For SERVERLESS SQL pools, I will perform data transformation using create table as select (CETAS)
+			- Reduces servers tro client network traffic, provides stronger security, eases mainenance and imrpoves performance
+			- The procedure controls what processes and activities are performend and protects the underlying database objects
+				Multiple users and client programs can perform operations on underlying database objects through a procedure
+				The users and programs wont need direct permissions on those underlying objkects
+			- The commands and a procedure are executed as a single batch of code(this reduce network traffic between server and client because only the call to excecute the procedure is sent across the network)
+		*********************************************************************************************
+		SSDT integrate with source control systems, native integration with Azure DevOps, Create Databse projects within Dedicated SQL pools
+		T-SQL statmentes support in dedicated and serverless sql pools: TRANSACTIONS, SELECT
+		Synapse dedicated SQL pools support JSON format data to be stored using standard NVARCHAR table columns
+		I can define Spark job definitions in Synapse develop hub using Scala, PySpark and .NET Spark
+		To transfer data to a dedicated SQL pool that is outside of the Synapse workspace, I can use as Auth method SQL Auth Only
+		To write data into a dedicated SQL pool I use WRITE API (created a table in the dedicated pool) and PolyBase is used to load the data into the created table
+		ISJSON is the TSQL function that verifies if a piece of textr is valid in JSON
+		Analytics supports using Azure Data Studio for connecting and querying Synapse SQL on dedicated and serverles sql pools
+		*********************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
 
